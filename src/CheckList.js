@@ -1,7 +1,11 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 
 export const CheckList = (props) => { 
-    console.log('I an in the chekbox', props.tasks);
+    CheckList.propTypes = {
+        cardId: PropTypes.number,
+        tasks: PropTypes.arrayOf(PropTypes.object)
+    }
 
     let tasksList = props.tasks.map((task) => {
         return (

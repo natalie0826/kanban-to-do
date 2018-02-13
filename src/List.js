@@ -1,7 +1,13 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import Card from './Card';
 
 export const List = (props) => {
+    List.propTypes = {
+        title: PropTypes.string.isRequired,
+        cards: PropTypes.arrayOf(PropTypes.object)
+    };
+
     let cards = props.cards.map((card) => {
         return <Card    key={card.id}
                         id={card.id}

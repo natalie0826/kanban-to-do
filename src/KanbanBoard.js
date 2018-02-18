@@ -1,25 +1,32 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { List } from './List';
+import { DragDropContext } from 'react-dnd';
+import HTML5Backend from 'react-dnd-html5-backend';
 
-export const KanbanBoard = (props) => {
-    KanbanBoard.propTypes = {
+import List from './List';
+
+class KanbanBoard extends React.Component {
+    static propTypes = {
         cards: PropTypes.arrayOf(PropTypes.object),
-        taskCallbacks: PropTypes.object
+        taskCallbacks: PropTypes.object,
+        cardCallbacks: PropTypes.object
     };
 
-    return (
-        
-        <div className="app">
-            <List id="todo" title="To Do" taskCallbacks={props.taskCallbacks} cards={
-                props.cards.filter(card => card.status === 'todo')
-            } />
-            <List id="in-progress" title="In Progress" taskCallbacks={props.taskCallbacks} cards={
-                props.cards.filter(card => card.status === 'in-progress')
-            } />
-            <List id="done" title="Done" taskCallbacks={props.taskCallbacks} cards={
-                props.cards.filter(card => card.status === 'done')
-            } />
-        </div>
-    );
+    render() {
+        return (
+            <div className="app">
+                <List id="todo" title="To Do" taskCallbacks={this.props.taskCallbacks}
+                    cardCallbacks={this.props.cardCallbacks}
+                    cards={this.props.cards.filter(card => card.status === 'todo')} />
+                <List id="in-progress" title="In Progress" taskCallbacks={this.props.taskCallbacks}
+                    cardCallbacks={this.props.cardCallbacks}
+                    cards={this.props.cards.filter(card => card.status === 'in-progress')} />
+                <List id="done" title="Done" taskCallbacks={this.props.taskCallbacks}
+                    cardCallbacks={this.props.cardCallbacks}
+                    cards={this.props.cards.filter(card => card.status === 'done')} />
+            </div>
+        );
+    }
 }
+
+export default DragDropContext(HTML5Backend)(KanbanBoard);

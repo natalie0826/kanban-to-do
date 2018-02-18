@@ -1,7 +1,7 @@
 import React from 'react';
 import 'whatwg-fetch';
 import update from 'react-addons-update';
-import { KanbanBoard } from '../KanbanBoard';
+import KanbanBoard from '../KanbanBoard';
 
 const API_URL = 'http://kanbanapi.pro-react.com';
 const API_HEADERS = {
@@ -116,13 +116,47 @@ export default class KanbanContainer extends React.Component {
         })
     }
 
+    updateCardStatus = (cardId, listId) => {
+        const cardIndex = this.state.cards.findIndex(card => card.id === cardId);
+        const card = this.state.cards[cardIndex];
+        if (card.status !== listId) {
+            this.setState(update(this.state, {
+                cards: {
+                    [cardIndex]: {
+                        status: { $set: listId }
+                    }
+                }
+            }));
+        }
+    }
+
+    updateCardPosition = (cardId, afterId) => {
+        if (cardId !== afterId) {
+            const cardIndex = this.state.cards.findIndex(card => card.is === cardId);
+            const card = this.state.cards[cardIndex];
+            const afterIndex = this.state.cards.findIndex(card => card.id === afterId);
+            this.setState(update(this.state, {
+                cards: {
+                    $splice: [
+                        [cardIndex, 1],
+                        [afterIndex, 0, card]
+                    ]
+                }
+            }));
+        }
+    }
+
     render() {
         return (
             <KanbanBoard    cards={this.state.cards}
                             taskCallbacks={{
                                 toggle: this.toggleTask,
                                 delete: this.deleteTask,
-                                add: this.addTask }} />
+                                add: this.addTask }}
+                            cardCallbacks={{
+                                updateStatus: this.updateCardStatus,
+                                updatePosition: this.updateCardPosition
+                            }} />
         );
     }
 }

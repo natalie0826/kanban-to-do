@@ -1,9 +1,13 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import marked from 'marked';
-import { CheckList } from './CheckList';
+import ReactCSSTransitionGroup from 'react-addons-css-transition-group';
+import { DragSource } from 'react-dnd';
 
-let titlePropType = (props, propName, componentName) => {
+import { CheckList } from './CheckList';
+import constants from './constants/constants';
+
+const titlePropType = (props, propName, componentName) => {
     if(props[propName]) {
         let value = props[propName];
         if(typeof value !== 'string' || value.length > 80) {
@@ -14,14 +18,26 @@ let titlePropType = (props, propName, componentName) => {
     }
 };
 
-export default class Card extends React.Component {
+const cardDragSpec = {
+    beginDrag(props) {
+        return { id: props.id };
+    }
+};
+
+const collectDrag = (connect, monitor) => {
+    return { connectDragSource: connect.dragSource() };
+}
+
+class Card extends React.Component {
     static propTypes = {
         id: PropTypes.number,
         title: titlePropType,
         description: PropTypes.string,
         color: PropTypes.string,
         tasks: PropTypes.arrayOf(PropTypes.object),
-        taskCallbacks: PropTypes.object
+        taskCallbacks: PropTypes.object,
+        cardCallbacks: PropTypes.object,
+        connectDragSource: PropTypes.func.isRequired
     };
 
     constructor(props) {
@@ -36,6 +52,8 @@ export default class Card extends React.Component {
     }
 
     render() {
+        const { connectDragSource } = this.props;
+
         let cardDetails;
 
         if (this.state.showDetails) {
@@ -59,14 +77,20 @@ export default class Card extends React.Component {
             backgroundColor: this.props.color
         };
 
-        return (
+        return connectDragSource(
             <div className="card">
                 <div style={sideColor} />
                 <div className={
                     this.state.showDetails ? "card__title card__title--is-open" : "card__title"
                 } onClick={this.toggleDetails}>{this.props.title}</div>
-                {cardDetails}
+                <ReactCSSTransitionGroup    transitionName="toggle"
+                                            transitionEnterTimeout={250}
+                                            transitionLeaveTimeout={250}>
+                    {cardDetails}
+                </ReactCSSTransitionGroup>
             </div>
         );
     }
 }
+
+export default DragSource(constants.CARD, cardDragSpec, collectDrag)(Card);

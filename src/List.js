@@ -5,16 +5,14 @@ import Card from './Card';
 export const List = (props) => {
     List.propTypes = {
         title: PropTypes.string.isRequired,
-        cards: PropTypes.arrayOf(PropTypes.object)
+        cards: PropTypes.arrayOf(PropTypes.object),
+        taskCallbacks: PropTypes.object
     };
 
     let cards = props.cards.map((card) => {
         return <Card    key={card.id}
-                        id={card.id}
-                        title={card.title}
-                        description={card.description}
-                        color={card.color}
-                        tasks={card.tasks} />
+                        taskCallbacks={props.taskCallbacks}
+                        {...card} />
     });
 
     return (
